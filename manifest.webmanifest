@@ -1,0 +1,9 @@
+{
+  "name": "CHRISTRACKER V2",
+  "short_name": "CHRISTRACKER",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#f4f5f7",
+  "theme_color": "#8b1e2d",
+  "description": "Whole-year student attendance tracker"
+}

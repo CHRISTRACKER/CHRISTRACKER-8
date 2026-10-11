@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#8b1e2d">
+<title>CHRISTRACKER V2</title>
+<link rel="manifest" href="manifest.webmanifest">
+<style>
+:root{--red:#8b1e2d;--red2:#b52b3c;--silver:#e7e9ed;--ink:#20232a;--muted:#69707d;--bg:#f4f5f7;--green:#147d4b}
+*{box-sizing:border-box}body{margin:0;font-family:Arial,Helvetica,sans-serif;background:var(--bg);color:var(--ink)}
+header{background:linear-gradient(120deg,var(--red),#54111b);color:white;padding:20px 16px 16px}
+header h1{margin:0;font-size:1.45rem;letter-spacing:.4px}header p{margin:6px 0 0;color:#f6e9eb;font-size:.9rem}
+main{max-width:1100px;margin:0 auto;padding:14px}
+nav{display:flex;gap:8px;overflow:auto;padding:8px 0 12px}
+button,.btn{border:0;border-radius:9px;padding:10px 13px;background:var(--red);color:white;font-weight:700;cursor:pointer;font-size:.92rem}
+button.secondary{background:#e4e6ea;color:#272b33}button.active{background:#fff;color:var(--red);box-shadow:inset 0 -3px var(--red)}
+nav button{white-space:nowrap;background:#dedfe4;color:#343842}
+.panel{background:white;border-radius:13px;padding:16px;margin:0 0 14px;box-shadow:0 2px 9px #1515150b}
+h2{font-size:1.08rem;margin:0 0 13px}h3{font-size:.98rem;margin:0 0 8px}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+label{display:block;font-size:.82rem;color:#505763;font-weight:700;margin-bottom:5px}
+input,select,textarea{width:100%;border:1px solid #cbd0d8;border-radius:8px;padding:10px;font:inherit;background:#fff;color:var(--ink)}
+textarea{min-height:90px;resize:vertical}.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.row>*{flex:0 0 auto}.row .grow{flex:1 1 180px}
+.small{font-size:.83rem;color:var(--muted)}.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.stat{background:#f5f5f7;border-radius:10px;padding:12px}.stat strong{display:block;font-size:1.35rem;color:var(--red)}.stat span{font-size:.78rem;color:var(--muted)}
+table{border-collapse:collapse;width:100%;font-size:.9rem}th,td{text-align:left;border-bottom:1px solid #e8e9ed;padding:9px 7px;vertical-align:middle}th{background:#f4f5f7;color:#454a54}
+.tablewrap{overflow:auto}td select{min-width:112px;padding:7px}td input[type=checkbox]{width:auto}
+.badge{display:inline-block;border-radius:20px;padding:4px 8px;font-size:.75rem;font-weight:bold;background:#eee}.ok{color:#126b40;background:#e2f5e9}.warn{color:#8b4c00;background:#fff1d8}.danger{color:#982334;background:#fde8eb}
+.hidden{display:none!important}.notice{border-left:4px solid var(--red);padding:10px 12px;background:#fff4f5;border-radius:5px;font-size:.88rem}
+footer{text-align:center;color:#7a808a;padding:10px 0 25px;font-size:.78rem}
+@media(max-width:650px){.grid{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,minmax(0,1fr))}main{padding:10px}.panel{padding:13px}header h1{font-size:1.25rem}th,td{padding:7px 5px}}
+@media print{header,nav,.noprint,footer{display:none!important}body{background:white}.panel{box-shadow:none;border:1px solid #ddd;break-inside:avoid}main{max-width:none;padding:0}}
+</style>
+</head>
+<body>
+<header><h1>CHRISTRACKER V2</h1><p>Whole-year student attendance • Multiple classes • Daily, weekly and monthly reports</p></header>
+<main>
+<nav class="noprint" id="nav">
+<button class="active" data-tab="dashboard">Dashboard</button><button data-tab="attendance">Daily Attendance</button><button data-tab="students">Students & Classes</button><button data-tab="reports">Reports</button><button data-tab="backup">Backup / Restore</button>
+</nav>
+<section id="dashboard" class="tab">
+<div class="panel"><div class="row"><div class="grow"><label>School Year</label><input id="schoolYear" placeholder="e.g. 2026–2027"></div><div class="grow"><label>Selected Class</label><select id="classSelect"></select></div><div class="grow"><label>Attendance Date</label><input type="date" id="dashDate"></div></div></div>
+<div class="panel"><h2>Attendance Summary</h2><div class="stats">
+<div class="stat"><strong id="sumPresent">0</strong><span>Present</span></div><div class="stat"><strong id="sumAbsent">0</strong><span>Absent</span></div><div class="stat"><strong id="sumLate">0</strong><span>Late</span></div><div class="stat"><strong id="sumExcused">0</strong><span>Excused</span></div></div><p class="small" id="dashNote">Select a class and date to see the summary.</p></div>
+<div class="panel"><h2>Quick start</h2><ol><li>Create a class in <b>Students & Classes</b>.</li><li>Paste student names, one name per line, then add them.</li><li>Record attendance every school day in <b>Daily Attendance</b>.</li><li>Check daily, weekly, monthly or yearly totals in <b>Reports</b>.</li></ol><p class="notice">Your records are saved in this browser on this device. Use Backup / Restore regularly so you don't lose them if browser data is cleared.</p></div>
+</section>
+<section id="attendance" class="tab hidden">
+<div class="panel"><h2>Record Daily Attendance</h2><div class="grid"><div><label>Class</label><select id="attClass"></select></div><div><label>Date</label><input type="date" id="attDate"></div></div><div class="row noprint" style="margin-top:12px"><button id="markAllPresent">Mark All Present</button><button id="saveAttendance">Save Attendance</button><button class="secondary" id="printAttendance">Print List</button></div><p class="small">Choose Present, Absent, Late, or Excused for each student. Late is counted separately from Present.</p></div>
+<div class="panel"><div class="tablewrap"><table><thead><tr><th>#</th><th>Student</th><th>Attendance</th></tr></thead><tbody id="attendanceRows"></tbody></table></div><p id="attendanceEmpty" class="small">No students in this class yet. Add them in Students & Classes.</p></div>
+</section>
+<section id="students" class="tab hidden">
+<div class="panel"><h2>Manage Classes</h2><div class="grid"><div><label>New class name</label><input id="newClassName" placeholder="e.g. Mathematics 9 - Mabini"></div><div style="align-self:end"><button id="addClass">Add Class</button></div></div><div class="row" style="margin-top:12px"><div class="grow"><label>Manage existing class</label><select id="manageClass"></select></div><button class="secondary" id="renameClass">Rename</button><button class="secondary" id="deleteClass">Delete Class</button></div><p class="small">Deleting a class removes its student list and attendance records from this browser.</p></div>
+<div class="panel"><h2>Add Students</h2><label>Paste student names (one per line)</label><textarea id="studentNames" placeholder="JUAN DELA CRUZ&#10;MARIA SANTOS&#10;..."></textarea><div class="row noprint" style="margin-top:10px"><button id="addStudents">Add Names to Selected Class</button><button class="secondary" id="clearNames">Clear Box</button></div><p class="small">Names are added to the class selected above. Duplicate names in the same class are skipped.</p></div>
+<div class="panel"><h2>Student List</h2><div class="tablewrap"><table><thead><tr><th>#</th><th>Student name</th><th class="noprint">Action</th></tr></thead><tbody id="studentRows"></tbody></table></div><p id="studentsEmpty" class="small">No students added yet.</p></div>
+</section>
+<section id="reports" class="tab hidden">
+<div class="panel"><h2>Attendance Reports</h2><div class="grid"><div><label>Class</label><select id="reportClass"></select></div><div><label>Report type</label><select id="reportType"><option value="daily">Daily</option><option value="weekly">Weekly</option><option value="monthly">Monthly</option><option value="yearly">Yearly</option></select></div><div><label>Reference date</label><input type="date" id="reportDate"></div><div><label>School year (label)</label><input id="reportYear" placeholder="e.g. 2026–2027"></div></div><div class="row noprint" style="margin-top:12px"><button id="makeReport">Generate Report</button><button class="secondary" id="exportCSV">Export CSV</button><button class="secondary" id="printReport">Print Report</button></div><p id="reportRange" class="small"></p></div>
+<div class="panel"><div class="stats"><div class="stat"><strong id="rPresent">0</strong><span>Present</span></div><div class="stat"><strong id="rAbsent">0</strong><span>Absent</span></div><div class="stat"><strong id="rLate">0</strong><span>Late</span></div><div class="stat"><strong id="rExcused">0</strong><span>Excused</span></div></div><p class="small">Totals count saved attendance entries within the selected period. Days not recorded are not counted as absences.</p></div>
+<div class="panel"><h2>Per-student totals</h2><div class="tablewrap"><table><thead><tr><th>#</th><th>Student</th><th>Present</th><th>Absent</th><th>Late</th><th>Excused</th></tr></thead><tbody id="reportRows"></tbody></table></div><p id="reportEmpty" class="small">Generate a report to view totals.</p></div>
+</section>
+<section id="backup" class="tab hidden">
+<div class="panel"><h2>Backup your records</h2><p>Download a JSON backup containing classes, students, settings and attendance records. Keep it somewhere safe.</p><button id="downloadBackup">Download Backup</button></div>
+<div class="panel"><h2>Restore records</h2><p class="small">Restoring replaces the data currently in this browser. Export a backup first if you need to keep the current records.</p><label>Choose a CHRISTRACKER backup (.json)</label><input type="file" id="restoreFile" accept=".json,application/json"><div class="row" style="margin-top:10px"><button id="restoreBackup">Restore Backup</button></div></div>
+<div class="panel"><h2>Data & privacy</h2><ul><li>Records are stored locally in this browser, not automatically synced across devices.</li><li>Use the same browser and device for consistent records.</li><li>For use on another device, download a backup and restore it there.</li><li>Avoid sharing backups because they contain student information.</li></ul><p class="notice">For best results, keep a backup at least weekly and before changing phones or clearing Chrome data.</p></div>
+</section>
+<footer>CHRISTRACKER V2 • Local browser edition</footer>
+</main>
+<script>
+const KEY='christracker_v2_data';
+const today=()=>{const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`};
+let db=load();
+function blank(){return {schoolYear:'2026–2027',classes:[],students:{},attendance:{}}}
+function load(){try{return JSON.parse(localStorage.getItem(KEY))||blank()}catch(e){return blank()}}
+function save(){localStorage.setItem(KEY,JSON.stringify(db))}
+function id(){return 'c'+Date.now().toString(36)+Math.random().toString(36).slice(2,7)}
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function selectedClass(){return document.getElementById('classSelect').value||db.classes[0]?.id||''}
+function className(cid){return db.classes.find(c=>c.id===cid)?.name||'(class deleted)'}
+function kids(cid){return db.students[cid]||[]}
+function recordKey(cid,date){return cid+'|'+date}
+function records(cid,date){return db.attendance[recordKey(cid,date)]||{}}
+function fillSelect(el,selected){const old=selected||el.value;el.innerHTML=db.classes.map(c=>`<option value="${c.id}">${esc(c.name)}</option>`).join('');if(!db.classes.length)el.innerHTML='<option value="">— Add a class first —</option>';if(db.classes.some(c=>c.id===old))el.value=old}
+function refreshSelects(){['classSelect','attClass','manageClass','reportClass'].forEach(x=>fillSelect(document.getElementById(x),document.getElementById(x).value));}
+function renderStudents(){const cid=document.getElementById('manageClass').value;const list=kids(cid);document.getElementById('studentRows').innerHTML=list.map((s,i)=>`<tr><td>${i+1}</td><td>${esc(s.name)}</td><td class="noprint"><button class="secondary" onclick="removeStudent('${cid}','${s.id}')">Remove</button></td></tr>`).join('');document.getElementById('studentsEmpty').classList.toggle('hidden',list.length>0)}
+function removeStudent(cid,sid){if(!confirm('Remove this student and their attendance history?'))return;db.students[cid]=(kids(cid)).filter(s=>s.id!==sid);Object.keys(db.attendance).forEach(k=>{if(k.startsWith(cid+'|'))delete db.attendance[k][sid]});save();renderStudents();renderAttendance();makeReport();renderDashboard()}
+function renderAttendance(){const cid=document.getElementById('attClass').value,date=document.getElementById('attDate').value||today(),rec=records(cid,date),list=kids(cid);document.getElementById('attendanceRows').innerHTML=list.map((s,i)=>`<tr><td>${i+1}</td><td>${esc(s.name)}</td><td><select data-sid="${s.id}"><option value="Present" ${rec[s.id]==='Present'?'selected':''}>Present</option><option value="Absent" ${rec[s.id]==='Absent'?'selected':''}>Absent</option><option value="Late" ${rec[s.id]==='Late'?'selected':''}>Late</option><option value="Excused" ${rec[s.id]==='Excused'?'selected':''}>Excused</option></select></td></tr>`).join('');document.getElementById('attendanceEmpty').classList.toggle('hidden',list.length>0)}
+function saveAttendance(){const cid=document.getElementById('attClass').value,date=document.getElementById('attDate').value||today();if(!cid)return alert('Please create/select a class first.');const r={};document.querySelectorAll('#attendanceRows select').forEach(el=>r[el.dataset.sid]=el.value);db.attendance[recordKey(cid,date)]=r;save();renderDashboard();makeReport();alert('Attendance saved for '+date+'.')}
+function count(list){const o={Present:0,Absent:0,Late:0,Excused:0};list.forEach(v=>{if(o[v]!==undefined)o[v]++});return o}
+function renderDashboard(){const cid=selectedClass(),date=document.getElementById('dashDate').value||today(),r=count(Object.values(records(cid,date)));document.getElementById('sumPresent').textContent=r.Present;document.getElementById('sumAbsent').textContent=r.Absent;document.getElementById('sumLate').textContent=r.Late;document.getElementById('sumExcused').textContent=r.Excused;document.getElementById('dashNote').textContent=`${className(cid)} • ${date} • ${Object.keys(records(cid,date)).length} attendance records saved.`}
+function period(date,type){const d=new Date(date+'T12:00:00');let start=new Date(d),end=new Date(d);if(type==='weekly'){const day=(d.getDay()+6)%7;start.setDate(d.getDate()-day);end=new Date(start);end.setDate(start.getDate()+6)}else if(type==='monthly'){start=new Date(d.getFullYear(),d.getMonth(),1,12);end=new Date(d.getFullYear(),d.getMonth()+1,0,12)}else if(type==='yearly'){start=new Date(d.getFullYear(),0,1,12);end=new Date(d.getFullYear(),11,31,12)}const fmt=x=>`${x.getFullYear()}-${String(x.getMonth()+1).padStart(2,'0')}-${String(x.getDate()).padStart(2,'0')}`;return [fmt(start),fmt(end)]}
+function makeReport(){const cid=document.getElementById('reportClass').value,type=document.getElementById('reportType').value,date=document.getElementById('reportDate').value||today(),[start,end]=period(date,type);document.getElementById('reportRange').textContent=`${className(cid)} • ${type[0].toUpperCase()+type.slice(1)}: ${start} to ${end}`;const per={};kids(cid).forEach(s=>per[s.id]={name:s.name,Present:0,Absent:0,Late:0,Excused:0});Object.entries(db.attendance).forEach(([key,rec])=>{const [c,d]=key.split('|');if(c!==cid||d<start||d>end)return;Object.entries(rec).forEach(([sid,v])=>{if(per[sid]&&per[sid][v]!==undefined)per[sid][v]++})});const vals=Object.values(per),tot={Present:0,Absent:0,Late:0,Excused:0};vals.forEach(v=>Object.keys(tot).forEach(k=>tot[k]+=v[k]));['Present','Absent','Late','Excused'].forEach(k=>document.getElementById('r'+k).textContent=tot[k]);document.getElementById('reportRows').innerHTML=vals.map((s,i)=>`<tr><td>${i+1}</td><td>${esc(s.name)}</td><td>${s.Present}</td><td>${s.Absent}</td><td>${s.Late}</td><td>${s.Excused}</td></tr>`).join('');document.getElementById('reportEmpty').classList.toggle('hidden',vals.length>0);window.currentReport={cid,type,start,end,vals,tot}}
+function csv(){makeReport();const r=window.currentReport;const rows=[['Class',className(r.cid)],['Report type',r.type],['Period',r.start+' to '+r.end],[],['No.','Student','Present','Absent','Late','Excused'],...r.vals.map((s,i)=>[i+1,s.name,s.Present,s.Absent,s.Late,s.Excused])];const content=rows.map(row=>row.map(x=>'"'+String(x??'').replace(/"/g,'""')+'"').join(',')).join('\r\n');download(content,`CHRISTRACKER_${r.type}_${r.start}.csv`,'text/csv;charset=utf-8;')}
+function download(content,name,type){const blob=new Blob([content],{type}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=name;a.click();URL.revokeObjectURL(url)}
+document.querySelectorAll('nav button').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('nav button').forEach(x=>x.classList.toggle('active',x===b));document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('hidden',x.id!==b.dataset.tab));if(b.dataset.tab==='attendance')renderAttendance();if(b.dataset.tab==='students')renderStudents();if(b.dataset.tab==='reports')makeReport()}));
+document.getElementById('schoolYear').value=db.schoolYear||'2026–2027';
+document.getElementById('schoolYear').addEventListener('change',e=>{db.schoolYear=e.target.value;save()});
+['dashDate','attDate','reportDate'].forEach(x=>document.getElementById(x).value=today());
+['classSelect','dashDate'].forEach(x=>document.getElementById(x).addEventListener('change',renderDashboard));
+document.getElementById('attClass').addEventListener('change',renderAttendance);document.getElementById('attDate').addEventListener('change',renderAttendance);
+document.getElementById('manageClass').addEventListener('change',renderStudents);document.getElementById('reportClass').addEventListener('change',makeReport);
+document.getElementById('reportType').addEventListener('change',makeReport);document.getElementById('reportDate').addEventListener('change',makeReport);
+document.getElementById('addClass').onclick=()=>{const name=document.getElementById('newClassName').value.trim();if(!name)return alert('Enter a class name.');if(db.classes.some(c=>c.name.toLowerCase()===name.toLowerCase()))return alert('That class already exists.');const cid=id();db.classes.push({id:cid,name});db.students[cid]=[];document.getElementById('newClassName').value='';save();refreshSelects();['classSelect','attClass','manageClass','reportClass'].forEach(x=>document.getElementById(x).value=cid);renderStudents();renderAttendance();renderDashboard();makeReport()};
+document.getElementById('renameClass').onclick=()=>{const cid=document.getElementById('manageClass').value,c=db.classes.find(c=>c.id===cid);if(!c)return alert('Choose a class.');const name=prompt('New class name:',c.name);if(name&&name.trim()){c.name=name.trim();save();refreshSelects();document.getElementById('manageClass').value=cid;renderStudents();renderDashboard();makeReport()}};
+document.getElementById('deleteClass').onclick=()=>{const cid=document.getElementById('manageClass').value;if(!cid)return alert('Choose a class.');if(!confirm('Delete '+className(cid)+' and all its records? This cannot be undone unless you have a backup.'))return;db.classes=db.classes.filter(c=>c.id!==cid);delete db.students[cid];Object.keys(db.attendance).forEach(k=>{if(k.startsWith(cid+'|'))delete db.attendance[k]});save();refreshSelects();renderStudents();renderAttendance();renderDashboard();makeReport()};
+document.getElementById('addStudents').onclick=()=>{const cid=document.getElementById('manageClass').value;if(!cid)return alert('Create/select a class first.');const names=document.getElementById('studentNames').value.split(/\r?\n/).map(s=>s.trim()).filter(Boolean);if(!names.length)return alert('Paste at least one student name.');const list=kids(cid),known=new Set(list.map(s=>s.name.toLowerCase()));let added=0;names.forEach(name=>{if(!known.has(name.toLowerCase())){list.push({id:id(),name});known.add(name.toLowerCase());added++}});db.students[cid]=list;save();renderStudents();renderAttendance();renderDashboard();makeReport();alert(`${added} student(s) added. Duplicate names were skipped.`)};
+document.getElementById('clearNames').onclick=()=>document.getElementById('studentNames').value='';
+document.getElementById('markAllPresent').onclick=()=>document.querySelectorAll('#attendanceRows select').forEach(s=>s.value='Present');
+document.getElementById('saveAttendance').onclick=saveAttendance;document.getElementById('printAttendance').onclick=()=>window.print();
+document.getElementById('makeReport').onclick=makeReport;document.getElementById('exportCSV').onclick=csv;document.getElementById('printReport').onclick=()=>{makeReport();window.print()};
+document.getElementById('downloadBackup').onclick=()=>download(JSON.stringify(db,null,2),'CHRISTRACKER_V2_backup_'+today()+'.json','application/json');
+document.getElementById('restoreBackup').onclick=()=>{const f=document.getElementById('restoreFile').files[0];if(!f)return alert('Choose a backup JSON file first.');if(!confirm('Replace all current CHRISTRACKER data with this backup?'))return;const reader=new FileReader();reader.onload=()=>{try{const x=JSON.parse(reader.result);if(!x.classes||!x.students||!x.attendance)throw new Error('Invalid backup');db=x;save();document.getElementById('schoolYear').value=db.schoolYear||'';refreshSelects();renderStudents();renderAttendance();renderDashboard();makeReport();alert('Backup restored successfully.')}catch(e){alert('Could not restore: the selected file is not a valid CHRISTRACKER backup.')}};reader.readAsText(f)};
+function init(){if(!db.classes.length){const cid=id();db.classes.push({id:cid,name:'My Class'});db.students[cid]=[]}save();refreshSelects();renderStudents();renderAttendance();renderDashboard();makeReport()}
+init();
+if('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(()=>{});
+</script>
+</body></html>
