@@ -1,6 +1,5 @@
 
-const CACHE = 'christracker-v2-cache-2';
-
+const CACHE = 'christracker-v2-cache-3';
 const FILES = [
   './',
   './index.html',
